@@ -612,7 +612,7 @@ def check_and_send(bot, chat_id, pokemons):
 
 def send_to_all(bot, message):
     if len(message) > 1:
-        message = ' '.join(str(message))
+        message = ' '.join(str(word) for word in message)
 
     for chat_id in jobs.keys():
         if isinstance(message, int):
