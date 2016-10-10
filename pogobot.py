@@ -411,8 +411,8 @@ def cmd_radius(bot, update, args):
 
     # Send confirmation
     bot.sendMessage(chat_id, text=lang.get_string(pref['language'], 17) % (pref['location'][0],
-                                                                               pref['location'][1],
-                                                                               1000 * pref['location'][2]))
+                                                                           pref['location'][1],
+                                                                           1000 * pref['location'][2]))
 
 
 def cmd_clear_location(bot, update):
@@ -472,6 +472,18 @@ def cmd_rem_from_whitelist(bot, update, args):
     except Exception as e:
         logger.error('[%s@%s] %s' % (user_name, chat_id, repr(e)))
         bot.sendMessage(chat_id, text=lang.get_string(prefs.get(chat_id).get('language'), 21))
+
+
+def cmd_broadcast(bot, update, args):
+    chat_id = update.message.chat_id
+    user_name = update.message.from_user.username
+    if not whitelist.is_whitelist_enabled():
+        bot.sendMessage(chat_id, text=lang.get_string(prefs.get(chat_id).get('language'), 20))
+        return
+    if not whitelist.is_admin(user_name):
+        logger.info('[%s@%s] User blocked (broadcast).' % (user_name, chat_id))
+        return
+    send_to_all(bot, args)
 
 
 # Functions
@@ -599,6 +611,9 @@ def check_and_send(bot, chat_id, pokemons):
 
 
 def send_to_all(bot, message):
+    if len(message) > 1:
+        message = ' '.join(str(message))
+
     for chat_id in jobs.keys():
         if isinstance(message, int):
             pref = prefs.get(chat_id)
@@ -719,7 +734,7 @@ def main():
     dp.add_handler(MessageHandler([Filters.location], cmd_location))
     dp.add_handler(CommandHandler("wladd", cmd_add_to_whitelist, pass_args=True))
     dp.add_handler(CommandHandler("wlrem", cmd_rem_from_whitelist, pass_args=True))
-
+    dp.add_handler(CommandHandler("broadcast", cmd_broadcast, pass_args=True))
     # log all errors
     dp.add_error_handler(error)
 

@@ -8,7 +8,6 @@ logger = logging.getLogger(__name__)
 
 
 class Locales:
-
     @staticmethod
     def __customisation_dict():
         # The default dictionary
@@ -143,9 +142,16 @@ class Locales:
         return r
 
     @property
-    def locales(self):
-        # return list(self.__locale.keys()) # THIS IS TO BE USED WHEN TRANSLATION IS COMPLETE
-        return list(self.__pokemon_name.keys())
+    def locales(self, switch=1):
+        l1 = set(self.__pokemon_name.keys())
+        l2 = set(self.__move_name.keys())
+        l3 = set(self.__locale.keys())
+        if switch == 0:  # THIS IS TO BE USED WHEN TRANSLATION IS COMPLETE
+            # Return complete languages
+            return list(l1 & l2 & l3)
+        elif switch == 1:
+            # Return partial languages
+            return list(l1 | l2 | l3)
 
     def __get_default_dir(self):
         directory = os.path.join(
